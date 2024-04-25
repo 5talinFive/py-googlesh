@@ -27,6 +27,7 @@ result = service.spreadsheets().values().get(
 values = result.get('values', [])
 
 # Si hay valores, el primer elemento es el encabezado y el resto son filas de datos
+#Leer datos
 if values:
     header = values[0]
     data = values[1:]
@@ -41,43 +42,77 @@ if values:
         print(row)
 else:
     print("No se encontraron datos en el rango especificado.")
+    
+
+#Ingresar nuevos datos
+def agregar_fila_a_spreadsheet(service, spreadsheet_id, range_name, new_row):
+    """
+    Agrega una nueva fila a la hoja de cálculo especificada.
+
+    Args:
+        service: Objeto del servicio de Google Sheets.
+        spreadsheet_id (str): ID de la hoja de cálculo.
+        range_name (str): Nombre del rango en la hoja de cálculo.
+        new_row (list): Lista que representa la nueva fila a agregar.
+    """
+    service.spreadsheets().values().append(
+        spreadsheetId=spreadsheet_id,
+        range=range_name,
+        valueInputOption='RAW',
+        body={'values': [new_row]}
+    ).execute()
+
+def ingresar_datos_por_teclado():
+    """
+    Solicita al usuario que ingrese los datos para una nueva fila.
+
+    Returns:
+        list: Lista que representa los datos ingresados por el usuario.
+    """
+    new_row = []
+    print("Ingrese los datos para la nueva fila:")
+    new_row.append(input("Nombre: "))
+    new_row.append(input("Curso: "))
+    new_row.append(input("Centro de atención: "))
+    new_row.append(input("Nota U1: "))
+    new_row.append(input("Nota U2: "))
+    new_row.append(input("Nota U3: "))
+    new_row.append(input("Nota U4: "))
+    return new_row
+
+# Ejemplo de uso:
+# Suponiendo que tienes ya definido 'service', 'SPREADSHEET_ID' y 'range_name'
+
+nueva_fila = ingresar_datos_por_teclado()
+datos_actualizados = agregar_fila_a_spreadsheet(service, SPREADSHEET_ID, range_name, nueva_fila)
 
 
 
-# Crear un nuevo dato
-# new_row = ['Stalin Sarango', 'Tlgo', 'el coca', '7', '7', '7', '7']
-# service.spreadsheets().values().append(
-#     spreadsheetId=SPREADSHEET_ID,
-#     range=range_name,
-#     valueInputOption='RAW',
-#     body={'values': [new_row]}
-# ).execute()
+#Eliminar fila
+def eliminar_datos_fila_por_teclado(service, spreadsheet_id, sheet_name):
+    """
+    Elimina los datos de una fila en la hoja de cálculo especificada,
+    solicitando al usuario el número de fila por teclado.
 
+    Args:
+        service: Objeto del servicio de Google Sheets.
+        spreadsheet_id (str): ID de la hoja de cálculo.
+        sheet_name (str): Nombre de la hoja de cálculo.
+    """
+    # Solicitar al usuario el número de fila
+    row_index = int(input("Ingrese el número de fila que desea limpiar: "))
 
-# Actualizar un dato en una celda específica
-update_value = 'Elver'
-service.spreadsheets().values().update(
-    spreadsheetId=SPREADSHEET_ID,
-    range='datafinal!A1336',  # Celda a actualizar
-    valueInputOption='RAW',
-    body={'values': [[update_value]]}
-).execute()
+    # Construir el rango del número de fila
+    range_name = f"{sheet_name}!{row_index}:{row_index}"
 
+    # Eliminar los datos de la fila especificada
+    service.spreadsheets().values().clear(
+        spreadsheetId=spreadsheet_id,
+        range=range_name
+    ).execute()
 
-# Eliminar el contenido de una celda específica
-# service.spreadsheets().values().clear(
-#     spreadsheetId=SPREADSHEET_ID,
-#     range='datafinal!A1336'  # Celda a borrar
-# ).execute()
-
-
-
-
-if __name__ == '__main__':
-    print("todo ok")
-
-
-
-
+# Ejemplo de uso:
+# Suponiendo que tienes ya definido 'service', 'SPREADSHEET_ID' y 'sheet_name'
+eliminar_datos_fila_por_teclado(service, SPREADSHEET_ID, 'datafinal')
 
 
